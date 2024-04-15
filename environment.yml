@@ -1,0 +1,17 @@
+name: netgeo_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python 
+  - pyrosm
+  - geopandas
+  - pandas
+  - networkx
+  - ipykernel
+  - osmnx
+  - libpysal
+  - contextily
+  - momepy
+  - r5py
+  - matplotlib  
