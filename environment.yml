@@ -15,3 +15,5 @@ dependencies:
   - momepy
   - r5py
   - matplotlib  
+  - alphashape
+  - descartes
