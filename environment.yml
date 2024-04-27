@@ -16,3 +16,6 @@ dependencies:
   - alphashape
   - descartes
   - plotnine
+
+
+  - haversine

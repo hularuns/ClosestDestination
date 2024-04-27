@@ -8,3 +8,6 @@ RoadNetworkAnalyst.code-workspace
 service.py
 service_area.html
 ../nearestLocation.ipynb
+GraphConvertTest.ipynb
+service_area_class_attempt.py
+__pycache__/service_area.cpython-312.pyc
