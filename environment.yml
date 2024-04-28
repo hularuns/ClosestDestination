@@ -11,11 +11,8 @@ dependencies:
   - ipykernel
   - osmnx
 #  - libpysal
-  - contextily
   - matplotlib  
   - alphashape
-  - descartes
-  - plotnine
-
+  - faker
 
   - haversine
