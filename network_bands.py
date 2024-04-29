@@ -1,4 +1,5 @@
-# from pyrosm import OSM
+
+from pyrosm import OSM
 import geopandas as gpd
 import pandas as pd
 import networkx as nx
@@ -7,9 +8,20 @@ from shapely.geometry import Point
 import matplotlib.pyplot as plt
 import alphashape
 from faker import Faker
+import numpy as np
+import time
+import services.function_progress as function_progress
 
-
-
+def load_osm_network(file_path:str, network_type:str, graph_type:str):
+    """ Load an OSM file and extract the network (driving, walking etc) as a graph (e.g. networkx graph) along with its nodes and edges.
+    G, nodes, edges = load_osm_network(args) to extract"""
+    
+    #Load OSM data, extract nodes and edges and create a network graph.
+    osm = OSM(file_path)
+    nodes, edges = osm.get_network(network_type=network_type, nodes=True)
+    G = osm.to_graph(nodes, edges, graph_type=graph_type)
+    
+    return G, nodes, edges
 
 def csv_to_gdf(csv, x_col:str, y_col:str, input_crs:int, crs_conversion:int = None):
     """ function to convert csv to a gdf based off X, Y coordinates and input CRS. Optional CRS conversion.
@@ -50,7 +62,7 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
     else:
         service_xy = {}
     
-    # Generate fake names if required. Anonymised naming. Also forces a workaround forcing dictionary if no name data.
+    # Generate fake names if required. Anonymised naming. Also forces a workaround forcing dictionary if no name data. Bit experimental
     if location_name is None and anon_name:
         fake = Faker()
         fake_names = []
@@ -58,22 +70,28 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
             fake_names.append(fake.city())
         start_locations['Fake Name'] = fake_names
         location_name = 'Fake Name' 
-
     for index, row in start_locations.iterrows():
+        print(f"{index+1} of {len(start_locations)}")
         #extract x and y for each library
         location_x = row['geometry'].x
         location_y = row['geometry'].y
         nearest_node = ox.distance.nearest_nodes(graph, location_x, location_y)
+        
 
         # Add nearest node info to service_xy
         if location_name:
             name = row[location_name]
             service_xy[name] = {'nearest_node': nearest_node}
+           
         else:
             service_xy.append({'nearest_node': nearest_node})
+           
+
+    return service_xy
 
 
-def single_source_polygon(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str):
+
+def single_source_polygon(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str, progress=False):
     """
     Generates a GeoDataFramecontaining polygons of service areas calculated using Dijkstra's algorithm within a networkx graph. 
     Each polygon represents a service area contour defined by a maximum distance from a source node.
@@ -89,13 +107,19 @@ def single_source_polygon(nearest_node_dict:dict, graph, search_distances:list, 
     
     # service_areas_dict = {} #uncomment with services_ares_dict[name]
     data_for_gdf = []
-
+    #for time tracking.
+    ongoing_time=[]
+    cumulative_time_total = 0
+    
     #For each start location [name] creates a polygon around the point.
-    for name in nearest_node_dict:
+    for index, (name, node_info) in enumerate(nearest_node_dict.items()):
+        print(f'Creating network service of sizes: {search_distances} metres')    
+        start_time = time.time() 
+        print(f'Processing: location {index+1} of {len(nearest_node_dict)}: {name}. ')
         #cycle through each distance in list supplied
         for distance in search_distances:
             #Extract nearest node to the name (start location)
-            nearest_node = nearest_node_dict[name]['nearest_node']
+            nearest_node = node_info['nearest_node']
             subgraph = nx.single_source_dijkstra_path_length(graph, nearest_node, cutoff=distance, weight = weight)
             
             #Creates a list of all nodes which are reachable within the cutoff.
@@ -116,6 +140,13 @@ def single_source_polygon(nearest_node_dict:dict, graph, search_distances:list, 
         
             data_for_gdf.append({'name': name, 'distance':distance, 'geometry': alpha_shape})
             # service_areas_dict[name] = alpha_shape #uncomment to check if function returns correct variables
+        
+        end_time = time.time()
+        if progress:
+            function_progress.function_progress(start_time=start_time, end_time=end_time,ongoing_time=ongoing_time,
+                                            total_tasks=len(nearest_node_dict), cumulative_time_total=cumulative_time_total)
+            
+
 
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
      #return the geodataframe
@@ -137,7 +168,7 @@ def network_area_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat, aggfunc:str 
     #Subset dataframe by dissolve category then run dissolve, dissolving and then subsetting creates invalid geoms.
     search_distances = geodataframe[dissolve_cat].unique()
     for distance in search_distances:
-        filtered_data = alpha_areas[alpha_areas[dissolve_cat] == distance].reset_index(drop=True)
+        filtered_data = geodataframe[geodataframe[dissolve_cat] == distance].reset_index(drop=True)
         filtered_data_dissolved = filtered_data.dissolve(aggfunc=aggfunc)
         data_for_gdf.append(filtered_data_dissolved)
     #Create gdf for each dissolved category
