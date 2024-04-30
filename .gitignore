@@ -1,4 +1,4 @@
 RoadNetworkAnalyst.code-workspace
-testEnvironment/
+# testEnvironment/
 test_cases/
 __pycache__/
