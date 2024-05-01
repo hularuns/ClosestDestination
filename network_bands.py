@@ -109,7 +109,7 @@ def single_source_polygon(nearest_node_dict:dict, graph, search_distances:list, 
     data_for_gdf = []
     #for time tracking.
     ongoing_time=[]
-    cumulative_time_total = 0
+    cumulative_total = 0
     
     #For each start location [name] creates a polygon around the point.
     for index, (name, node_info) in enumerate(nearest_node_dict.items()):
@@ -143,9 +143,11 @@ def single_source_polygon(nearest_node_dict:dict, graph, search_distances:list, 
         
         end_time = time.time()
         if progress:
-            function_progress.function_progress(start_time=start_time, end_time=end_time,ongoing_time=ongoing_time,
-                                            total_tasks=len(nearest_node_dict), cumulative_time_total=cumulative_time_total)
-            
+            cumulative_progress = function_progress.function_progress(start_time=start_time, end_time=end_time,
+                                                                      ongoing_time=ongoing_time, total_tasks=len(nearest_node_dict))
+            cumulative_total += cumulative_progress
+            print(f'{cumulative_progress}')
+            print(f'A total of {round(cumulative_total,2)} has passed.')
 
 
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
@@ -201,53 +203,3 @@ def network_area_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat, aggfunc:str 
     
     return differenced_gdf
 
-
-def network_area_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat, aggfunc:str ='first', show_graph:bool=False):
-    """ 
-    Dissolves polygons in a GeoDataFrame by category type. Currently only supports dissolve categories which are buffer area integers.
-    Differencing occurs based upon <Larger size - next smaller size>.
-    Parameters:
-        geodataframe (gpd.GeoDataFrame): Geopandas Data Frame.
-        dissolve_cat (int): Column to dissolve dataframe by. Must be an integer as the polygons will difference based on ordered size.
-        aggfunc (func or str): Aggregation function, same as the geopandas.GeoSeries.dissole argument. {Default: 'first'}
-        show_graph (bool): Shows a simple graph of network area bands using matplotlib. {Default: None}
-        """
-    data_for_gdf = []
-    differenced_geoms = []
-    category_values = []
-    #Subset dataframe by dissolve category then run dissolve, dissolving and then subsetting creates invalid geoms.
-    search_distances = geodataframe[dissolve_cat].unique()
-    for distance in search_distances:
-        filtered_data = geodataframe[geodataframe[dissolve_cat] == distance].reset_index(drop=True)
-        filtered_data_dissolved = filtered_data.dissolve(aggfunc=aggfunc)
-        data_for_gdf.append(filtered_data_dissolved)
-    #Create gdf for each dissolved category
-    gdf_dissolve = gpd.GeoDataFrame(pd.concat(data_for_gdf, ignore_index=True), crs='EPSG:4326')
-    
-    #sort data so that the smallest area which cannot be differenced is exluded.
-    #iterates so that the larger area which is a lower indexis differenced by the geom above it.
-    gdf_dissolve_sorted = gdf_dissolve.sort_values(by=dissolve_cat, ascending=False)
-    for index in range(0,len(gdf_dissolve_sorted)-1):
-        differenced_part = gdf_dissolve_sorted.geometry.iloc[index].difference(gdf_dissolve_sorted.geometry.iloc[index+1])
-        differenced_geoms.append(differenced_part)
-        category_values.append(gdf_dissolve_sorted.iloc[index][dissolve_cat])
-
-    #append the smallest geom as this is excluded from the dissolve difference loop.
-    final_index = (len(gdf_dissolve_sorted)-1)
-    differenced_geoms.append(gdf_dissolve_sorted.iloc[final_index]['geometry'])
-    category_values.append(gdf_dissolve_sorted.iloc[final_index][dissolve_cat])
-    
-    #append geometry to geodataframe to return as final result
-    differenced_gdf = gpd.GeoDataFrame({'geometry': differenced_geoms, dissolve_cat: category_values})
-    print('Network areas have successfully been dissolved and differenced')
-    #produces a quick and ready map for instant analysis, if show_graph = True.
-    if show_graph:
-        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
-        differenced_gdf.plot(column=dissolve_cat, cmap='cividis', alpha=0.8, ax=ax, legend=True,
-                                legend_kwds={'label': dissolve_cat, 'orientation': 'horizontal',
-                                            'fraction': 0.036})
-        plt.autoscale(enable=True, axis='both', tight=True)
-        plt.show()
-        print('A map showing contours has been created.')
-    
-    return differenced_gdf
