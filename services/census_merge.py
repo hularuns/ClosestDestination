@@ -29,7 +29,7 @@ def join_census_csv(dict_of_df:dict, join_column:str, drop:bool, join_type='left
                 
             columns_dropped.append(columns_to_drop)
             joined_df = pd.merge(joined_df, df_to_join, on=join_column, how=join_type)
-            
+    #without this the dataframe is  doubled in length.           
     joined_df.drop_duplicates(subset=join_column, inplace=True)
     
     if drop:
@@ -39,7 +39,7 @@ def join_census_csv(dict_of_df:dict, join_column:str, drop:bool, join_type='left
     return joined_df
 
 ## Remove duplicates if they are the right suffix. Retains the Left suffix variant and cleans the names
-def drop_dupe_cols(df:pd.DataFrame, left_suffix:str, right_suffix:str):
+def drop_dupe_cols(df:pd.DataFrame, suffixes:tuple):
     """ Drops the suffixes from the merged pandas dataframe and removeng duplicate columns from the right table if they are prsent in the left table.
     Parameters:
         - df (pd.DataFrame): A pandas dataframe.
