@@ -2,3 +2,5 @@ RoadNetworkAnalyst.code-workspace
 # testEnvironment/
 test_cases/
 __pycache__/
+testEnvironment/Data/roads
+testEnvironment/pointer
