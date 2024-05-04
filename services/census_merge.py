@@ -29,8 +29,33 @@ def join_census_csv(dict_of_df:dict, join_column:str, drop:bool, join_type='left
                 
             columns_dropped.append(columns_to_drop)
             joined_df = pd.merge(joined_df, df_to_join, on=join_column, how=join_type)
+            
+    joined_df.drop_duplicates(subset=join_column, inplace=True)
+    
     if drop:
         print(f'The following columns were duplicates from the right join and were dropped: {columns_dropped}')
     else:
         print('No columns were dropped, all duplicate columns retained.')
     return joined_df
+
+## Remove duplicates if they are the right suffix. Retains the Left suffix variant and cleans the names
+def drop_dupe_cols(df:pd.DataFrame, left_suffix:str, right_suffix:str):
+    """ Drops the suffixes from the merged pandas dataframe and removeng duplicate columns from the right table if they are prsent in the left table.
+    Parameters:
+        - df (pd.DataFrame): A pandas dataframe.
+        - suffixes (tuple): A tuple string of the suffix names from the merge.
+        """
+    left_suffix, right_suffix = suffixes
+    columns_to_drop = []
+    
+    for column in df.columns:
+        
+        if column.endswith(right_suffix):
+            columns_to_drop.append(column)
+            
+        elif column.endswith(left_suffix):
+            new_name = column.rstrip(left_suffix) #get the name minus the suffix.
+            df.rename(columns={column: new_name}, inplace=True)
+    
+    # drops the right suffix columns
+    df.drop(columns=columns_to_drop, inplace=True)
