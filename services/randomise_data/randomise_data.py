@@ -32,5 +32,5 @@ for i, row in gdf.iterrows():
     new_geometry = translate(current_geometry, xoff=row['shift_x'], yoff=row['shift_y'])
     gdf.at[i, 'geometry'] = new_geometry
 
-gdf.drop(columns=['shift_x', 'shift_y'])
+gdf.drop(columns=['shift_x', 'shift_y'], inplace=True)
 gdf.to_file(r'C:\Users\hular\projects\ClosestDestination\testEnvironment\Data\pointer_randomised.shp')

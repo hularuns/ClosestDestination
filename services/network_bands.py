@@ -205,7 +205,7 @@ def network_contours(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:st
     differenced_geoms.append(gdf_dissolve_sorted.iloc[final_index]['geometry'])
     category_values.append(gdf_dissolve_sorted.iloc[final_index][dissolve_cat])
     #append geometry to geodataframe to return as final result
-    differenced_gdf = gpd.GeoDataFrame({'geometry': differenced_geoms, dissolve_cat: category_values})
+    differenced_gdf = gpd.GeoDataFrame({'geometry': differenced_geoms, dissolve_cat: category_values}, crs=geodataframe.crs)
     print('Network areas have successfully been dissolved and differenced')
     #produces a quick and ready map for instant analysis.
     if show_graph:
