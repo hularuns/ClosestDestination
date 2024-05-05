@@ -3,10 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python 
+  - python > 3.6 =< 3.12
   - pyrosm
-  - geopandas
-  - pandas
+  - geopandas =<0.14.3
+  - pandas =< 2.2.2
   - networkx
   - ipykernel
   - osmnx

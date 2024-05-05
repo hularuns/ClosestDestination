@@ -15,14 +15,14 @@ import uuid
 def load_osm_network(file_path:str, network_type:str, graph_type:str):
     """ Load an OSM file and extract the network (driving, walking etc) as a graph (e.g. networkx graph) along with its nodes and edges.
     G, nodes, edges = load_osm_network(args) to extract.
+    RETURNS: G, nodes and edges
     
         Parameters:
     - file_path (str): File path of OSM road data, a .pbf file.
     - network_type (str): Type of transport, e.g. driving, walking, cycling.
     - graph_type: Type of graph to create, available types: networkx, pandana, igraph. Likely choose networkx for use with rest of the methods.
     """
-    
-    #Load OSM data, extract nodes and edges and create a network graph.
+
     osm = OSM(file_path)
     nodes, edges = osm.get_network(network_type=network_type, nodes=True)
     G = osm.to_graph(nodes, edges, graph_type=graph_type)
@@ -177,7 +177,8 @@ def network_contours(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:st
     Parameters:
         geodataframe (gpd.GeoDataFrame): Geopandas Data Frame.
         dissolve_cat (str): Column to dissolve dataframe by.
-        aggfunc (func or str): defaults to first. Same as geopandas aggfunc aggregation.
+        aggfunc (func or str): ame as geopandas aggfunc aggregation. Defaults to first.
+        show_graph (bool): If true, will show a basic graph of output. Defaults to false.
         """
         #Smallest first, e.g. 1000, then 2000, then 3000
     data_for_gdf = []
@@ -215,7 +216,7 @@ def network_contours(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:st
                                             'fraction': 0.036})
         plt.autoscale(enable=True, axis='both', tight=True)
         plt.show()
-        print('A map showing contours has been created.')
+        print('A map showing network contours has been created.')
     
     return differenced_gdf
 
