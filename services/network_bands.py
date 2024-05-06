@@ -171,7 +171,7 @@ def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
     return gdf_alpha
 
 
-def network_contours(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str ='first', show_graph:bool=False):
+def network_service_areas(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str ='first', show_graph:bool=False):
     """ 
     Dissolves polygons in a GeoDataFrame by category type. Currently only supports dissolve categories which are buffer area integers.
     Parameters:
