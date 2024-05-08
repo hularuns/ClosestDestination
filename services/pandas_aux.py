@@ -37,3 +37,31 @@ def append_col_prefix(df, col_names:list, prefix):
     df.rename(columns=rename_dict, inplace=True)
 
     return df
+  
+  
+def append_col_prefix(df, col_names:list, prefix):
+    """ Renames columns in a pandas DataFrame to append a prefix to a column name, useful for when data is unstacked.
+        Parameters:
+    - df (DataFrame): input dataframe, can be geopandas or pandas.
+    - col_names (list): List of columns to append.
+    - prefix (str|int): Prefix to append to the column names.
+    
+    """
+    rename_dict = {}
+    
+    for name in col_names:
+        float_name = float(name)
+        #this handles if it's a float to convert nicely
+        if float_name in df.columns:
+            rename_dict[float_name] = f'{prefix}_{name}'
+        # handles otherwise
+        elif name in df.columns:
+            rename_dict[name] = f'{prefix}_{name}'
+        else:
+            #print failed column check and continues
+            print(f'{name} not in dataframe')
+            
+            
+    df.rename(columns=rename_dict, inplace=True)
+
+    return df
