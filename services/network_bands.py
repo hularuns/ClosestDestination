@@ -60,7 +60,8 @@ def csv_to_gdf(csv, x_col:str, y_col:str, input_crs:int, crs_conversion:int = No
         print(f'Exception error: {Exception}')
         
         
-def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_name: str = None, anon_name: bool = False):
+def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_name: str = None, 
+                          anon_name: bool = False, progress: bool = True):
     """ Creates a dictionary of location names and nearest node on Graph. If no location name column specified, creates a list.
     Anonymised naming can be enabled by not inputting location_name and anon_name = True. This also forces a dictionary type if you only have point data.
     
@@ -84,30 +85,29 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
             fake_names.append(fake.city())
         start_locations['Fake Name'] = fake_names
         location_name = 'Fake Name' 
+        
+    # Calculate the nearest note for each start_location
     for index, row in start_locations.iterrows():
         print(f"{index+1} of {len(start_locations)}")
-        #extract x and y for each library
         location_x = row['geometry'].x
         location_y = row['geometry'].y
         nearest_node = ox.distance.nearest_nodes(graph, location_x, location_y)
         
-
-        # Add nearest node info to service_xy
+        # Add nearest node name to service_xy
         if location_name:
             name = row[location_name]
-            service_xy[name] = {'nearest_node': nearest_node}
-           
+            service_xy[name] = {'nearest_node': nearest_node}        
         else:
             service_xy.append({'nearest_node': nearest_node})
-           
 
     return service_xy
 
 
 
-def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str, progress=False):
+def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str, 
+                  progress=False, save_output:bool = False):
     """
-    Generates a GeoDataFramecontaining polygons of service areas calculated using Dijkstra's algorithm within a networkx graph. 
+    Generates a GeoDataFramecontaining polygons of service areas calculated using Dijkstra's shortest path algorithm within a networkx graph. 
     Each polygon represents a service area contour defined by a maximum distance from a source node.
 
     Parameters:
@@ -150,9 +150,8 @@ def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
             node_point_series_tuples_list = node_points_series.apply(lambda point: (point.x, point.y))
             correct_points_list = node_point_series_tuples_list.tolist()
             
-            #Create an alpha shape for each polygon.
+            #Create an alpha shape for each polygon and append to dataframe.
             alpha_shape = alphashape.alphashape(correct_points_list, alpha_value)
-        
             data_for_gdf.append({'name': name, 'distance':distance, 'geometry': alpha_shape})
             # service_areas_dict[name] = alpha_shape #uncomment to check if function returns correct variables
         
@@ -165,13 +164,15 @@ def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
             print(f'{cumulative_progress}')
             print(f'The process has been running for {round(cumulative_total,2)} seconds.')
 
-
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
+    if save_output:
+        gdf_alpha.to_file('network_areas.gpkg')
      #return the geodataframe
     return gdf_alpha
 
 
-def network_service_areas(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str ='first', show_graph:bool=False):
+def network_service_areas(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str ='first', 
+                          show_graph:bool = False, save_output:bool = False):
     """ 
     Dissolves polygons in a GeoDataFrame by category type. Currently only supports dissolve categories which are buffer area integers.
     Parameters:
@@ -217,6 +218,9 @@ def network_service_areas(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfu
         plt.autoscale(enable=True, axis='both', tight=True)
         plt.show()
         print('A map showing network contours has been created.')
+    
+    if save_output:
+        differenced_gdf.to_file('network_service_areas.gpkg')
     
     return differenced_gdf
 
