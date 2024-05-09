@@ -1,6 +1,7 @@
 # Service Area Tools
 ![Python](https://img.shields.io/badge/python-3.06+-blue.svg) 
-[![Jupyter](https://img.shields.io/badge/Jupyter-launch%20notebook-orange?style=flat&logo=Jupyter)](data_analys.ipynb)
+![GitHub Release](https://img.shields.io/github/v/release/hularuns/Service-Area-Tools)
+
 ## Overview
 
 This repository contains Python scripts aimed at automating the creation of road service areas 
