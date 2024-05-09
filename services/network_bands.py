@@ -131,7 +131,7 @@ def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
         print(f'Creating network service of sizes: {search_distances} metres')    
         start_time = time.time() 
         print(f'Processing: location {index+1} of {len(nearest_node_dict)}: {name}. ')
-        #cycle through each distance in list supplied
+        #cycle through each distance in list supplied creating service areas for each
         for distance in search_distances:
             #Extract nearest node to the name (start location)
             nearest_node = node_info['nearest_node']
@@ -147,11 +147,11 @@ def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
 
             # Makes the x,y values into just a list of tuples to be used to create alphashapes
             node_points_series = pd.Series(node_points_list)
-            node_point_series_tuples_list = node_points_series.apply(lambda point: (point.x, point.y))
-            correct_points_list = node_point_series_tuples_list.tolist()
+            node_point_series_tuples = node_points_series.apply(lambda point: (point.x, point.y))
+            node_point_tuple_list = node_point_series_tuples.tolist()
             
             #Create an alpha shape for each polygon and append to dataframe.
-            alpha_shape = alphashape.alphashape(correct_points_list, alpha_value)
+            alpha_shape = alphashape.alphashape(node_point_tuple_list, alpha_value)
             data_for_gdf.append({'name': name, 'distance':distance, 'geometry': alpha_shape})
             # service_areas_dict[name] = alpha_shape #uncomment to check if function returns correct variables
         
