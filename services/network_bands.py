@@ -15,12 +15,26 @@ import uuid
 def load_osm_network(file_path:str, network_type:str, graph_type:str):
     """ Load an OSM file and extract the network (driving, walking etc) as a graph (e.g. networkx graph) along with its nodes and edges.
     G, nodes, edges = load_osm_network(args) to extract.
-    RETURNS: G, nodes and edges
     
-        Parameters:
+    Returns: 
+    --------
+    G (MultiDiGraph), nodes (gdf) and edges (gdf)
+    
+    Parameters:
+    -----------
     - file_path (str): File path of OSM road data, a .pbf file.
     - network_type (str): Type of transport, e.g. driving, walking, cycling.
     - graph_type: Type of graph to create, available types: networkx, pandana, igraph. Likely choose networkx for use with rest of the methods.
+    
+    Example:
+    ---------
+    
+    >>> roads = 'file/path/roads.pbf'
+    >>> G, nodes, edges = services.network_bands.load_osm_network(file_path = roads, network_type = 'driving', graphy_type = 'networkx')
+    >>> print(G)
+    >>> 'MultiDiGraph named Made with Pyrosm library. with 222854 nodes and 440792 edges'
+    >>> print(len(nodes), len(edges))
+    >>> '225125 233911'
     """
 
     osm = OSM(file_path)
@@ -30,13 +44,29 @@ def load_osm_network(file_path:str, network_type:str, graph_type:str):
     return G, nodes, edges
 
 def csv_to_gdf(csv, x_col:str, y_col:str, input_crs:int, crs_conversion:int = None):
-    """ function to convert csv to a gdf based off X, Y coordinates and input CRS. Optional CRS conversion.
-        Parameters:
+    """ function to convert csv to a gdf based off X, Y coordinates and input CRS, with an optional CRS conversion.
+    
+    Returns:
+    --------
+    GeoDataFrame (Geopandas GeoDataFrame) of input locations.
+    
+    Parameters:
+    -----------
     - csv: source data as csv with geom x and y column separate.
     - x_col (str): column name for the x coordinate.
     - y_col (str): str, column name for the y coordinate.
     - input_crs (int): int, EPSG code for input coordinate reference system.
     - crs_conversion (int):optional EPSG code for converting CRS.
+    
+    Example:
+    --------
+    
+    >>> csv_path = 'file/path/data.csv'
+    >>> locations = services.network_bands.csv_to_gdf(csv = csv_path, x_col = 'X', y_col = 'Y', 
+    >>>                                               input_crs = 29902, crs_conversion = 4326)
+    >>> locations.head()
+    >>> name     X      Y            geometry
+    >>> charlie  331131 376131 POINT (-5.97089 54.61635)
     """
     #create a list for each row of geom by zipping and turn into a point tuple
     try:
@@ -61,15 +91,32 @@ def csv_to_gdf(csv, x_col:str, y_col:str, input_crs:int, crs_conversion:int = No
         
         
 def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_name: str = None, 
-                          anon_name: bool = False, progress: bool = True):
+                          anon_name: bool = False):
     """ Creates a dictionary of location names and nearest node on Graph. If no location name column specified, creates a list.
     Anonymised naming can be enabled by not inputting location_name and anon_name = True. This also forces a dictionary type if you only have point data.
     
+    Returns:
+    --------
+    Dictionary (dict) of points and nearest node id on the graph.
+    
     Parameters:
+    -----------
         graph (networkx.Graph): The graph representing the network.
         start_locations (GeoDataFrame): Geopandas GeoDataFrame of start locations.
         location_name (str): Optional; column storing name of start location.
         anon_name (bool): If True, generates fake names.
+        
+    Example:
+    --------
+    
+    >>> name = gdf['name']
+    >>> node_dict = services.network_bands.nearest_node_and_bane(graph = G, start_locations = gdf, location_name = name
+    >>>                                                          anon_name = False)
+    >>> print(node_dict)
+    >>>  {'Ardoyne Library': {'nearest_node': 475085580},
+    >>> 'Ballyhackamore Library': {'nearest_node': 73250694},
+    >>> 'Belfast Central Library': {'nearest_node': 4513699587}}
+    
     """   
     # Initialise service_xy based on the presence of location_name
     if location_name is None and not anon_name:
@@ -77,12 +124,15 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
     else:
         service_xy = {}
     
-    # Generate fake names if required. Anonymised naming. Also forces a workaround forcing dictionary if no name data. Bit experimental
+    # Generate fake names if required. Anonymised naming. Also forces a workaround forcing dictionary if no name data, 
+    # could just use uuid though. Bit experimental
     if location_name is None and anon_name:
         fake = Faker()
         fake_names = []
+        
         for i in range(len(start_locations)):
             fake_names.append(fake.city())
+            
         start_locations['Fake Name'] = fake_names
         location_name = 'Fake Name' 
         
@@ -110,14 +160,26 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
     Generates a GeoDataFramecontaining polygons of service areas calculated using Dijkstra's shortest path algorithm within a networkx graph. 
     Each polygon represents a service area contour defined by a maximum distance from a source node.
 
+    Returns:
+    --------
+    Polygons in a GeoDataFrame.
+    
     Parameters:
+    -----------
         nearest_node_dict (dict): A dictionary with names as keys and the nearest node on the graph as values. This is an output from the `nearest_node_and_name` function.
         graph (networkx.Graph): The graph representing the network, often designated as `G` in networkx.
         cutoffs (list of int): Distances in meters that define the bounds of each service area.
         alpha_value (int): The alpha value used to create non-convex polygons via the alphashape method.
-        weight (str): The edge attribute in the graph to use as a weight.
+        weight (str): The edge attribute in the graph to use as a weight, e.g. 'length', 'speed' etc.
         progress (bool): If True, will print progress of the function.
-
+    
+    Example:
+    --------
+    >>> node_dict = services.network_bands.nearest_node_and_name(...)
+    >>> dist_list = [1000, 2000, 3000]
+    >>> polygon = services.network_bands.service_areas(nearest_node_dict = node_dict, graph = G, search_distances = dist_list
+                                                       alpha_value = 500, weight = 'length', progress = False, save_output = True)
+    >>> 'service area polygons have been successfully saved to a geopackage'
     """
     
     # service_areas_dict = {} #uncomment with services_ares_dict[name]
@@ -167,6 +229,7 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
     if save_output:
         gdf_alpha.to_file('service_areas.gpkg')
+        print(f'service area polygons have been successfully saved to a geopackage')
      #return the geodataframe
     return gdf_alpha
 
@@ -175,12 +238,28 @@ def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str =
                           show_graph:bool = False, save_output:bool = False):
     """ 
     Dissolves polygons in a GeoDataFrame by category type; useful for creating clean network service areas. Currently only supports dissolve categories which are buffer area integers.
+    
+    Returns:
+    --------
+    Dissolved polygons in a GeoDataFrame.
+    
     Parameters:
+    -----------
         geodataframe (gpd.GeoDataFrame): Geopandas Data Frame.
         dissolve_cat (str): Column to dissolve dataframe by.
         aggfunc (func or str): ame as geopandas aggfunc aggregation. Defaults to first.
         show_graph (bool): If true, will show a basic graph of output. Defaults to false.
+    
+    Example:
+    --------
+    
+    >>> service_areas = services.network_bands.service_areas(...)
+    >>> polygon = services.network_bands.service_bands(geodataframe = service_areas, dissolve_cat = 'distance', progress = True
+    >>>                                                aggfunc = 'first', show_graph = True, save_output = True)
+    >>> 'A map showing network contours has been created.'
+    
         """
+        
         #Smallest first, e.g. 1000, then 2000, then 3000
     data_for_gdf = []
     differenced_geoms = []
@@ -221,6 +300,6 @@ def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str =
     
     if save_output:
         differenced_gdf.to_file('service_bands.gpkg')
-    
+        print(f'service area polygons have been successfully saved to a geopackage')    
     return differenced_gdf
 

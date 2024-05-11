@@ -13,31 +13,6 @@ def fill_na_with_zero(df, columns):
     # Fill NaN values with 0 in the specified columns
     df[columns] = df[columns].fillna(0)
     return df
-
-
-def append_col_prefix(df, col_names:list, prefix):
-    """ Renames columns in a pandas DataFrame to append a prefix to a column name, useful for when data is unstacked.
-        Parameters:
-    - df (DataFrame): input dataframe, can be geopandas or pandas.
-    - col_names (list): List of columns to append.
-    - prefix (str|int): Prefix to append to the column names.
-    
-    """
-    rename_dict = {}
-    
-    for name in col_names:
-        float_name = f'{float(name)}'
-        #this handles if it's a float to convert nicely
-        if float_name in df.columns:
-            rename_dict[float_name] = f'{prefix}_{(name)}'
-        # handles otherwise
-        else:
-            rename_dict[f'{name}'] = f'{prefix}_{(name)}'
-      
-    df.rename(columns=rename_dict, inplace=True)
-
-    return df
-  
   
 def append_col_prefix(df, col_names:list, prefix):
     """ Renames columns in a pandas DataFrame to append a prefix to a column name, useful for when data is unstacked.
