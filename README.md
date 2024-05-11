@@ -21,7 +21,7 @@ These tools can be used in standalone projects, simply by including the [service
 First, clone the GitHub repository. This can be done using gitbash (alternatives are available):
 
 ```gitbash
-git clone https://github.com/hularuns/ClosestDestination
+git clone https://github.com/hularuns/Service-Area-Tools
 ```
 #### Dependencies
 **Pip**
