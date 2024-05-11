@@ -1,0 +1,31 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Service Area Tools
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Sam
+    family-names: Groves
+    email: mrsamgroves@outlook.com
+    affiliation: Ulster University
+repository-code: 'https://github.com/hularuns/Service-Area-Tools'
+url: 'https://github.com/hularuns/Service-Area-Tools'
+abstract: >-
+  A collection of python tools aimed at automating the
+  creation of road service areas performing complex spatial
+  and network analyses, specifically tailored for
+  geographical data processing and visualization, focusing
+  on census data integration with network-based spatial
+  analysis.
+keywords:
+  - Python
+  - GIS
+  - Graphs
+  - Network analysis
+license: GPL-3.0
+version: v1.0.4
+date-released: '2024-05-11'

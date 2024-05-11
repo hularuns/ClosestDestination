@@ -30,8 +30,8 @@ All dependencies can be installed using pip with the following command:
 
  ```bash 
  pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel
- matplotlib alphashape faker folium jupyter
- ````
+ matplotlib alphashape faker folium jupyter jupyter_core jupyter_client
+ ```
 
 **Conda**
 Optionally, you can also install all dependencies using conda with the following steps:

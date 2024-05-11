@@ -4,14 +4,17 @@ channels:
   - defaults
 dependencies:
   - python >= 3.6, < 3.13
- # - pyrosm # excluded for now.
+  - pyrosm
+  - osmnx
   - geopandas <= 0.14.3
   - pandas <= 2.2.2
   - networkx
   - ipykernel
- # - osmnx # excluded for now
   - matplotlib  
   - alphashape
   - faker
   - folium
-  - jupyter #included only for example.
+  - notebook 
+  - nb_conda  
+  - jupyter_client
+  - jupyter_core
