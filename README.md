@@ -29,7 +29,8 @@ git clone https://github.com/hularuns/ClosestDestination
 All dependencies can be installed using pip with the following command: 
 
  ```bash 
- pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel matplotlib alphashape faker folium jupyter
+ pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel
+ matplotlib alphashape faker folium jupyter
  ````
 
 **Conda**
@@ -47,11 +48,11 @@ The functions in this script can be added to your project simply by including th
 ```python
 import services
 
-services.network_bands.network_start_locations_nearest_node  =  network_bands.nearest_node_and_name(
-                                                                                graph = G, 
-                                                                                start_locations = start_locations_gdf, 
-                                                                                location_name  =  'Static Library Name')
+services.network_bands.network_start_locations_nearest_node  =  network_bands.nearest_node_and_name(graph = G, 
+                                                                                                    start_locations = start_locations_gdf, 
+                                                                                                    location_name  =  'Static Library Name')
 ```
+                                                                                                    
 
 ### Example Script:
 
@@ -87,8 +88,8 @@ print(start_locations_gdf)
 | Static Library Name             |geometry                   |
 |---------------------------------|---------------------------|
 | Ardoyne Library                 | POINT (-5.97089 54.61635) |
-| Ballyhackamore Library	      | POINT (-5.86641 54.59504) |
-| Belfast Central Library	      | POINT (-5.93147 54.60270) |
+| Ballyhackamore Library	         | POINT (-5.86641 54.59504) |
+| Belfast Central Library	        | POINT (-5.93147 54.60270) |
 
 # Obtain the nearest nodes on the Graph
 start_locations_nearest_node  =  network_bands.nearest_node_and_name(
@@ -114,10 +115,10 @@ network_areas  =  network_bands.service_areas(nearest_node_dict = start_location
                                               save_output = True) #Saves output automatically to .gpkg
 ## Create tidy service area polygons by dissolving and differencing based on attributes.
 network_service_areas  =  network_bands.service_bands(geodataframe=network_areas, #output of network_areas() or service areas gdf.
-                                                              dissolve_cat = 'distance', # column to dissolve by
-                                                              aggfunc = 'first', #geopandas aggregate arg
-                                                              show_graph = True, #displays output
-                                                              save_output = True) #Saves output automatically to .gpkg
+                                                      dissolve_cat = 'distance', # column to dissolve by
+                                                      aggfunc = 'first', #geopandas aggregate arg
+                                                      show_graph = True, #displays output
+                                                      save_output = True) #Saves output automatically to .gpkg
 
 # Do subsequent analysis. See data_analysis.ipynb for an example.
 ```
