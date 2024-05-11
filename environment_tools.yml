@@ -1,0 +1,17 @@
+name: netgeo_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python >= 3.6, < 3.13
+ # - pyrosm # excluded for now.
+  - geopandas <= 0.14.3
+  - pandas <= 2.2.2
+  - networkx
+# - ipykernel
+ # - osmnx # excluded for now
+  - matplotlib  
+  - alphashape
+  - faker
+  # - folium
+  # - jupyter #included only for example.
