@@ -208,8 +208,8 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
                 node_points_list.append(Point(x, y))
 
             # Makes the x,y values into just a list of tuples to be used to create alphashapes
-            node_points_series = pd.Series(node_points_list)
-            node_point_series_tuples = node_points_series.apply(lambda point: (point.x, point.y))
+
+            node_point_series_tuples = (pd.Series(node_points_list)).apply(lambda point: (point.x, point.y))
             node_point_tuple_list = node_point_series_tuples.tolist()
             
             #Create an alpha shape for each polygon and append to dataframe.
@@ -223,7 +223,6 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
             cumulative_progress = function_progress.function_progress(start_time=start_time, end_time=end_time,
                                                                       ongoing_time=ongoing_time, total_tasks=len(nearest_node_dict))
             cumulative_total += cumulative_progress
-            print(f'{cumulative_progress}')
             print(f'The process has been running for {round(cumulative_total,2)} seconds.')
 
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
