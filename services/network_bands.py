@@ -104,7 +104,7 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
 
 
 
-def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str, 
+def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str, 
                   progress=False, save_output:bool = False):
     """
     Generates a GeoDataFramecontaining polygons of service areas calculated using Dijkstra's shortest path algorithm within a networkx graph. 
@@ -166,15 +166,15 @@ def network_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
 
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
     if save_output:
-        gdf_alpha.to_file('network_areas.gpkg')
+        gdf_alpha.to_file('service_areas.gpkg')
      #return the geodataframe
     return gdf_alpha
 
 
-def network_service_areas(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str ='first', 
+def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str ='first', 
                           show_graph:bool = False, save_output:bool = False):
     """ 
-    Dissolves polygons in a GeoDataFrame by category type. Currently only supports dissolve categories which are buffer area integers.
+    Dissolves polygons in a GeoDataFrame by category type; useful for creating clean network service areas. Currently only supports dissolve categories which are buffer area integers.
     Parameters:
         geodataframe (gpd.GeoDataFrame): Geopandas Data Frame.
         dissolve_cat (str): Column to dissolve dataframe by.
@@ -220,7 +220,7 @@ def network_service_areas(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfu
         print('A map showing network contours has been created.')
     
     if save_output:
-        differenced_gdf.to_file('network_service_areas.gpkg')
+        differenced_gdf.to_file('service_bands.gpkg')
     
     return differenced_gdf
 

@@ -28,10 +28,12 @@ git clone https://github.com/hularuns/ClosestDestination
 
 All dependencies can be installed using pip with the following command: 
 
- `pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel matplotlib alphashape faker folium jupyter`
+ ```bash 
+ pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel matplotlib alphashape faker folium jupyter
+ ````
 
 **Conda**
-You can also install all dependencies using conda with the following steps:
+Optionally, you can also install all dependencies using conda with the following steps:
 
 Using conda terminal navigate to the cloned repository where the [environment.yml](environment.yml) file is found  and run the following commands:
 
@@ -46,10 +48,9 @@ The functions in this script can be added to your project simply by including th
 import services
 
 services.network_bands.network_start_locations_nearest_node  =  network_bands.nearest_node_and_name(
-graph = G, 
-start_locations = start_locations_gdf, 
-location_name  =  'Static Library Name')
-
+                                                                                graph = G, 
+                                                                                start_locations = start_locations_gdf, 
+                                                                                location_name  =  'Static Library Name')
 ```
 
 ### Example Script:
@@ -66,7 +67,7 @@ Please read the [How-to guide](Documentation/how-to) for a more more in-depth gu
 
 
 <details>
-<summary><b>Click Here To Show Code</b></summary>
+<summary><b>Click Here To Show Example Code Usage</b></summary>
   
 ```python
 import  services.network_bands  as  network_bands
@@ -75,7 +76,7 @@ import  services.network_bands  as  network_bands
 # Ensure all data is in same CRS as pbf (likely EPSG:4326)
 file_path = '/path/to/city.osm.pbf'
 
-G, nodes, edges = load_osm_network(file_path=file_path, network_type='driving', graph_type='networkx')
+G, nodes, edges = network_bands.load_osm_network(file_path=file_path, network_type='driving', graph_type='networkx')
 
 
 # Define start locations and distances for creating service areas
@@ -86,8 +87,8 @@ print(start_locations_gdf)
 | Static Library Name             |geometry                   |
 |---------------------------------|---------------------------|
 | Ardoyne Library                 | POINT (-5.97089 54.61635) |
-| Ballyhackamore Library	  | POINT (-5.86641 54.59504) |
-| Belfast Central Library	  | POINT (-5.93147 54.60270) |
+| Ballyhackamore Library	      | POINT (-5.86641 54.59504) |
+| Belfast Central Library	      | POINT (-5.93147 54.60270) |
 
 # Obtain the nearest nodes on the Graph
 start_locations_nearest_node  =  network_bands.nearest_node_and_name(
@@ -104,18 +105,19 @@ print(start_locations_nearest_node)
 distances = [1000,2000,3000] # Distances in meters
 
 ## Create individual service area polygons for each start location and distance.
-network_areas  =  network_bands.network_areas(nearest_node_dict = start_locations_nearest_node, 
+network_areas  =  network_bands.service_areas(nearest_node_dict = start_locations_nearest_node, 
                                               graph = G , #networkX graph
                                               search_distances = search_distances, 
                                               alpha_value=500, # Value for alpha shape
                                               weight  =  'length', # chooses shortest path based off length
-                                              progress = True) # Prints ongoing progress
-
+                                              progress = True, # Prints ongoing progress
+                                              save_output = True) #Saves output automatically to .gpkg
 ## Create tidy service area polygons by dissolving and differencing based on attributes.
-network_service_areas  =  network_bands.network_service_areas(geodataframe=network_areas, #output of network_areas() or service areas gdf.
+network_service_areas  =  network_bands.service_bands(geodataframe=network_areas, #output of network_areas() or service areas gdf.
                                                               dissolve_cat = 'distance', # column to dissolve by
                                                               aggfunc = 'first', #geopandas aggregate arg
-                                                              show_graph = True) #displays output
+                                                              show_graph = True, #displays output
+                                                              save_output = True) #Saves output automatically to .gpkg
 
 # Do subsequent analysis. See data_analysis.ipynb for an example.
 ```
