@@ -40,7 +40,7 @@ search_distances = [1000,2000,3000]
 #Create individual service_areas around start locations. alpha area of 500 quite good for Belfast
 service_areas = network_bands.service_areas(nearest_node_dict = start_locations_nearest_node, graph = G, 
                                                     search_distances = search_distances, alpha_value = 500, weight = 'length', 
-                                                    progress = True, save_output=True)
+                                                    save_output=True)
 #Create network service areas by dissolving and differencing polygons based on distance.
 service_bands = network_bands.service_bands(service_areas, dissolve_cat = 'distance',aggfunc = 'first', 
                                                             show_graph = True, save_output = True)

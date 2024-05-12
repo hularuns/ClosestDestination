@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import alphashape
 from faker import Faker
 import time
-import services.function_progress as function_progress
+from tqdm import tqdm
 import uuid
 
 def load_osm_network(file_path:str, network_type:str, graph_type:str):
@@ -137,8 +137,7 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
         location_name = 'Fake Name' 
         
     # Calculate the nearest note for each start_location
-    for index, row in start_locations.iterrows():
-        print(f"{index+1} of {len(start_locations)}")
+    for index, row in tqdm(start_locations.iterrows(), total=start_locations.shape[0], desc="Processing start locations"):
         location_x = row['geometry'].x
         location_y = row['geometry'].y
         nearest_node = ox.distance.nearest_nodes(graph, location_x, location_y)
@@ -155,7 +154,7 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
 
 
 def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_value:int, weight:str, 
-                  progress=False, save_output:bool = False):
+                  save_output:bool = False):
     """
     Generates a GeoDataFramecontaining polygons of service areas calculated using Dijkstra's shortest path algorithm within a networkx graph. 
     Each polygon represents a service area contour defined by a maximum distance from a source node.
@@ -182,20 +181,15 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
                                                        alpha_value = 500, weight = 'length', progress = False, save_output = True)
     >>> 'service area polygons have been successfully saved to a geopackage'
     """
-    
-    # service_areas_dict = {} #uncomment with services_ares_dict[name]
+
     data_for_gdf = []
-    #for time tracking.
-    ongoing_time=[]
-    cumulative_total = 0
-    
+
+    print(f'Creating network service areas of sizes: {search_distances} metres')    
     #For each start location [name] creates a polygon around the point.
-    for index, (name, node_info) in enumerate(nearest_node_dict.items()):
-        print(f'Creating network service of sizes: {search_distances} metres')    
-        start_time = time.time() 
-        print(f'Processing: location {index+1} of {len(nearest_node_dict)}: {name}. ')
+    for index, (name, node_info) in tqdm(enumerate(nearest_node_dict.items()), total=len(nearest_node_dict), desc='Processing nodes'):        
+        # print(f'Processing: location {index+1} of {len(nearest_node_dict)}: {name}. ')
         #cycle through each distance in list supplied creating service areas for each
-        for distance in search_distances:
+        for distance in tqdm(search_distances, total=len(search_distances), desc=f'Processing: location {index+1} of {len(nearest_node_dict)}: {name} : '):
             #Extract nearest node to the name (start location)
             nearest_node = node_info['nearest_node']
             subgraph = nx.single_source_dijkstra_path_length(graph, nearest_node, cutoff=distance, weight = weight)
@@ -216,14 +210,6 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
             alpha_shape = alphashape.alphashape(node_point_tuple_list, alpha_value)
             data_for_gdf.append({'name': name, 'distance':distance, 'geometry': alpha_shape})
             # service_areas_dict[name] = alpha_shape #uncomment to check if function returns correct variables
-        
-        end_time = time.time()
-        #Small timer to assess roughly progress.
-        if progress:
-            cumulative_progress = function_progress.function_progress(start_time=start_time, end_time=end_time,
-                                                                      ongoing_time=ongoing_time, total_tasks=len(nearest_node_dict))
-            cumulative_total += cumulative_progress
-            print(f'The process has been running for {round(cumulative_total,2)} seconds.')
 
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
     if save_output:
@@ -304,3 +290,51 @@ def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str =
         print(f'service area polygons have been successfully saved to a geopackage')    
     return differenced_gdf
 
+
+
+def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locations:gpd.GeoDataFrame, networkx_graph):
+    """ Shortest distance to destination function. Iterates over each destination for each input location.
+    Uses dijkstra's algorithm to iterate. WARNING - TAKES A VERY LONG TIME.
+    
+    Paramters:
+        beginning_dataset (GeoDatFrame): Start location dataset with geometry
+        destination_dataset (GeoDatFrame): Destination dataset with geometry
+        network_x_graph (MultiDiGraph): graph created using networkx {default: g}
+        
+    Example:
+    --------
+    
+    >>> shortest_path_iterator(pointer, start_locations_gdf, G)
+    """
+    #Preload the nearest nodes to destination to reduce insane run times
+    # Create a dict of destination ids to iterate over with houses.
+    
+    #locations
+    
+    dest_node_ids = {}
+    
+    for index, row in destination_locations.iterrows():
+        # start_time = time.time() 
+        print(f"{index+1} of {len(destination_locations)}")
+        dest_x = row['geometry'].x
+        dest_y = row['geometry'].y
+        dest_node_ids[index] = ox.distance.nearest_nodes(networkx_graph, dest_x, dest_y)
+
+    #iterate over each house, then library.
+    for index, row in tqdm(start_locations.iterrows(), total=len(start_locations), desc="Calculating shortest paths"):
+        orig_x = row['geometry'].x
+        orig_y = row['geometry'].y       
+        orig_node_id = ox.distance.nearest_nodes(networkx_graph, X = orig_x, Y = orig_y)
+        
+
+        # iterate over destination node id dictionary for shortest distance out of all desitnations
+        shortest_distance = float('inf')
+
+        for index, dest_node_id in dest_node_ids.items():
+            path_length = nx.shortest_path_length(networkx_graph, source=orig_node_id, target = dest_node_id,
+                                                  weight = 'length')
+            if path_length < shortest_distance:
+                shortest_distance = path_length
+ 
+        # Update the shortest distance in the DataFrame
+        start_locations.at[index, 'shortest_dist_to_dest'] = shortest_distance

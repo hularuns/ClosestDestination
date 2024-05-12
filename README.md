@@ -29,16 +29,31 @@ git clone https://github.com/hularuns/Service-Area-Tools
 All dependencies can be installed using pip with the following command: 
 
  ```bash 
- pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel
- matplotlib alphashape faker folium jupyter jupyter_core jupyter_client
+ pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel matplotlib pyrosm alphashape faker folium jupyter tqdm
  ```
-
+ 
+ Should you wish to only use the core functionality and not run the example script, you only need to install the following:
+ ```bash
+ pip install "python>=3.6" "geopandas<=0.14.3" "pandas<=2.2.2" networkx matplotlib pyrosm alphashape faker tqdm
+```
 **Conda**
 Optionally, you can also install all dependencies using conda with the following steps:
 
-Using conda terminal navigate to the cloned repository where the [environment.yml](environment.yml) file is found  and run the following commands:
+Using conda terminal navigate to the cloned repository where the [environment.yml](environment.yml) file is found.  and run the following commands:
 
-Create the environment: `conda env create -f environment.yml` then activate the environment: `conda activate netgeo_env`
+Create the environment: 
+```bash
+conda env create -f environment.yml
+```
+If you wish to only use the core functionality and not wish to install jupyter notebook dependencies:
+```bash
+conda env create -f environment_tools.yml
+```
+
+then activate the environment: 
+``` bash 
+conda activate netgeo_env
+```
 
 
 ### Using In Your Own Project:
@@ -159,7 +174,7 @@ The roadmap provides a glimpse into the current plans and priorities for future 
 
 We will be welcoming contributions from the community, particularly with bugs. You can contribute by:
 
-- [Submitting bugs and feature requests](https://github.com/username/project-name/issues), and help us verify as they are checked in.
+- [Submitting bugs and feature requests](https://github.com/hularuns/Service-Area-Tools/issues), and help us verify as they are checked in.
 
 
 ## License

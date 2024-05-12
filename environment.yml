@@ -18,3 +18,4 @@ dependencies:
   - nb_conda  
   - jupyter_client
   - jupyter_core
+  - tqdm
