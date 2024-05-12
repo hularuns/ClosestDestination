@@ -1,25 +1,13 @@
 import time 
         
-def function_progress(start_time, end_time, ongoing_time, total_tasks,
-                      pred_avg_time = True, pred_total_time = True):
-    """ Function progress timer, Requires 
-    `ongoing_time=[]
-    cumulative_time_total = 0` to be initalised at start of loop.
+def function_progress(start_time: time, end_time:time , ongoing_time:list, total_tasks:int,
+                      pred_avg_time:bool = True, pred_total_time:bool = True):
+    """ Function to be used within a function to track ongoing function progress and to print to console average 
+    time for completion and total predicted time.
     
-    each loop should have calculations calculated for, wrapped in start_time and end_time using the `time` package, e.g.:
-    
-    `import time
-    def function:
-        start_time = time.time()
-        
-        computer_intensive_process
-        
-        end_time = time.time()
-        
-    elapsed_time = end_time-start_time
-    ongoing_time.append(elapsed_time)`
     
     Parameters:
+    -----------
         start_time: time.time() at start of loop.
         end_time: time.time() at end of loop.
         ongoing_time: list of times which are appended to each loop.
@@ -27,6 +15,21 @@ def function_progress(start_time, end_time, ongoing_time, total_tasks,
         pred_avg_time: If true will print average time of each loop.
         pred_total_Time: If true will print the predicted average time.
         
+    Example:
+    --------
+    >>> import time
+    >>> ongoing_time=[]
+    >>> cumulative_time_total = 0 #to be initalised at start of loop.
+    >>> 
+    >>> def function():
+    >>>     computer_intensive_process
+    >>>         start_time = time.time()
+    >>>         end_time = time.time()
+    >>>    
+    >>>     cumulative_progress = function_progress.function_progress(start_time = start_time, end_time = end_time, 
+                                                                  ongoing_time = ongoing_time, total_tasks = len(object_interated_over))
+    >>>     cumulative_total += cumulative_progress
+    >>>     print(f'The process has been running for {round(cumulative_total, 2)} seconds.')
     """
     
     elapsed_time = end_time - start_time

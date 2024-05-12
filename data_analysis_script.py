@@ -9,10 +9,8 @@ import branca.colormap as cm
 import json
 
 #project specific packages
-import services.network_bands as network_bands
-import services.batch_csv as batch_csv
-import services.census_merge as census_merge
-import services.pandas_aux as pdaux
+
+from services import network_bands, batch_csv, census_merge, pandas_aux as pdaux
 
 # %%
 #set base directory for data file paths.
@@ -26,14 +24,16 @@ G, nodes, edges = network_bands.load_osm_network(file_path=base_road_path, netwo
 start_locations = pd.read_csv(f'{base_dir}\\testEnvironment\\Data\\libraries_belfast_2024.csv')
 print(start_locations.columns)
 #Ensure data is converted to a dataframe
-start_locations_gdf = network_bands.csv_to_gdf(start_locations, 'X COORDINATE', 'Y COORDINATE', 29902, 4326)
+start_locations_gdf = network_bands.csv_to_gdf(csv = start_locations, x_col = 'X COORDINATE', y_col = 'Y COORDINATE', 
+                                               input_crs = 29902, crs_conversion = 4326)
 
 # %%
 #Network graph creation.
 #Create the network areas and service areas - Considering making this into a Class with basic GUI, but for now fine as this.
 start_locations_nearest_node = network_bands.nearest_node_and_name(graph=G, start_locations=start_locations_gdf,  
-                                                                   location_name = 'Static Library Name', progress = True)
+                                                                   location_name = 'Static Library Name')
 
+# %%
 #Create service areas for each distance. Remember, these overlap, good for counting checking how close 
 #input custom distances as a list.
 search_distances = [1000,2000,3000]

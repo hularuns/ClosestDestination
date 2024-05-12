@@ -172,6 +172,7 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
         alpha_value (int): The alpha value used to create non-convex polygons via the alphashape method.
         weight (str): The edge attribute in the graph to use as a weight, e.g. 'length', 'speed' etc.
         progress (bool): If True, will print progress of the function.
+        save_output (bool): If True, will save output as `service_areas.gpkg` to root folder.
     
     Example:
     --------
@@ -208,7 +209,6 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
                 node_points_list.append(Point(x, y))
 
             # Makes the x,y values into just a list of tuples to be used to create alphashapes
-
             node_point_series_tuples = (pd.Series(node_points_list)).apply(lambda point: (point.x, point.y))
             node_point_tuple_list = node_point_series_tuples.tolist()
             
@@ -244,16 +244,17 @@ def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str =
     
     Parameters:
     -----------
-        geodataframe (gpd.GeoDataFrame): Geopandas Data Frame.
+        geodataframe (gpd.GeoDataFrame): Geopandas Data Frame, can use the output of network_bands.service_aras().
         dissolve_cat (str): Column to dissolve dataframe by.
-        aggfunc (func or str): ame as geopandas aggfunc aggregation. Defaults to first.
-        show_graph (bool): If true, will show a basic graph of output. Defaults to false.
-    
+        aggfunc (func or str): Same as geopandas aggfunc aggregation. Defaults to first.
+        show_graph (bool): If true, will show a basic graph of output. Defaults to False.
+        save_output (bool): If True, will save output as `service_areas.gpkg` to root folder. Defaults to False.
+        
     Example:
     --------
     
     >>> service_areas = services.network_bands.service_areas(...)
-    >>> polygon = services.network_bands.service_bands(geodataframe = service_areas, dissolve_cat = 'distance', progress = True
+    >>> polygon = services.network_bands.service_bands(geodataframe = service_areas, dissolve_cat = 'distance',
     >>>                                                aggfunc = 'first', show_graph = True, save_output = True)
     >>> 'A map showing network contours has been created.'
     
@@ -274,6 +275,7 @@ def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str =
     
     #sort data so that the smallest area which cannot be differenced is exluded.
     #iterates so that the larger area which is a lower indexis differenced by the geom above it.
+    #note to self: next step to make it work without dissolving prior.
     gdf_dissolve_sorted = gdf_dissolve.sort_values(by=dissolve_cat, ascending=False)
     for index in range(0,len(gdf_dissolve_sorted)-1):
         differenced_part = gdf_dissolve_sorted.geometry.iloc[index].difference(gdf_dissolve_sorted.geometry.iloc[index+1])
