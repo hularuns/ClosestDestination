@@ -306,11 +306,9 @@ def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locatio
     
     >>> shortest_path_iterator(pointer, start_locations_gdf, G)
     """
+    print("WARNING: This process will take an outrageous amount of time.")
     #Preload the nearest nodes to destination to reduce insane run times
-    # Create a dict of destination ids to iterate over with houses.
-    
-    #locations
-    
+    # by ceating a dict of destination ids to iterate over with houses.
     dest_node_ids = {}
     
     for index, row in destination_locations.iterrows():
