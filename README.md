@@ -9,22 +9,22 @@ This repository contains Python scripts aimed at automating the creation of road
 
 These tools can be used in standalone projects, simply by including the [services](services/) folder within your project's repository.
 
-## How To Use
+Please read the [How-To Guide](Documentation/Service_Area_Tools_Guide) for a full guide on the use of this tool.
 
-### Requirements
+## Requirements
 - Python 3.06+
 - Jupyter Notebooks (optional)
-- Currently if you utilise these tools from start to finish, offline OSM `.pbf` data is used for the creation of the road networks. The use of tools such as [osmconvert](https://wiki.openstreetmap.org/wiki/Osmconvert) or [Osmosis](https://wiki.openstreetmap.org/wiki/Osmosis) can be used to obtain large road network areas.
+- Currently these tools utilise offline OSM data  `.pbf` files for the creation of the road networks. The use of tools such as [osmconvert](https://wiki.openstreetmap.org/wiki/Osmconvert) or [Osmosis](https://wiki.openstreetmap.org/wiki/Osmosis) can be used to obtain large OSM road network areas.
 
-### Installation/Set-up
-#### Cloning
+## Installation/Set-up
+### Cloning
 First, clone the GitHub repository. This can be done using gitbash (alternatives are available):
 
 ```gitbash
 git clone https://github.com/hularuns/Service-Area-Tools
 ```
-#### Dependencies
-**Pip**
+### Installing Dependencies
+#### Install with Pip
 
 All dependencies can be installed using pip with the following command: 
 
@@ -36,51 +36,61 @@ All dependencies can be installed using pip with the following command:
  ```bash
  pip install "python>=3.6" "geopandas<=0.14.3" "pandas<=2.2.2" networkx matplotlib pyrosm alphashape faker tqdm
 ```
-**Conda**
+#### Install with Conda
 Optionally, you can also install all dependencies using conda with the following steps:
 
 Using conda terminal navigate to the cloned repository where the [environment.yml](environment.yml) file is found.  and run the following commands:
 
-Create the environment: 
+#### Create the environment: 
 ```bash
 conda env create -f environment.yml
 ```
-If you wish to only use the core functionality and not wish to install jupyter notebook dependencies:
-```bash
-conda env create -f environment_tools.yml
-```
+**NOTE**: If you wish to only use the core functionality and not wish to install jupyter notebook dependencies, replace `environment.yml` with `environment_tools.yml`
 
-then activate the environment: 
+
+#### Activate the environment: 
 ``` bash 
 conda activate netgeo_env
 ```
 
 
-### Using In Your Own Project:
+## Using In Your Own Project:
 
 The functions in this script can be added to your project simply by including the entirety of the [services/](services/) folder and then imported into your project, for example with similar code to as below:
 
-```python
-import services
+<details>
+<summary><b>Example Using In your Own Project</b></summary>
 
-services.network_bands.network_start_locations_nearest_node  =  network_bands.nearest_node_and_name(graph = G, 
-                                                                                                    start_locations = start_locations_gdf, 
-                                                                                                    location_name  =  'Static Library Name')
+```python
+from services import nearest_note_and_name
+
+services.network_bands.network_start_locations_nearest_node  =  nearest_node_and_name(graph = G, 
+                                                                                      start_locations = start_locations_gdf, 
+                                                                                      location_name = 'Static Library Name')
 ```
-                                                                                                    
+</details>                                                                                      
 
 ### Example Script:
 
--  **data_analysis.ipynb**: This is a script showcasing how to use the tool and example subsequent analysis and output with data stored in [testEnvironment/Data](testEnvironment/Data). 
-- With the `netgeo_env` conda environment activated, navigate to the cloned repository folder and run the example script from the conda terminal: ``jupyter notebook data_analysis.ipynb``
-- If successful an interactive webmap using folium is created in the parent folder of the repository called [index.html](index.html).
+For a detailed example, see [**data_analysis.ipynb**](data_analysis.ipynb) which is a script showing how to use the tools and some example analysis using data in [testEnvironment/Data](testEnvironment/Data). 
+ 
 
-#### Example Usage:
+
+#### Running the Example Script:
+
+- With the `netgeo_env` conda environment activated, navigate to the cloned repository folder and run the example script from the conda terminal: 
+```bash
+jupyter notebook data_analysis.ipynb
+```
+- If you do not want to use a notebook, an equivalent [python script](data_analysis_script.py) with identical code is available which can be ran with `netgeo_env` activated and ran from the cloned repository using the command: 
+``` bash
+python data_analysis_script.py
+```
+- If successful an interactive webmap using folium is created in the root folder of the repository called [index.html](index.html) as well as two geopackage files called **network_areas.gpkg** and **network_bands.gpkg**.
 
 This directory contains modules that provide various functionalities such as data loading, transformation, spatial analysis, and visualization. Below is an example of how to use the core functions of this repository to create a network service areas.
 
-Please read the [How-to guide](Documentation/how-to) for a more more in-depth guide on how to install, use and debug the code with specific use cases and examples.
-
+Please read the [How-to guide](Documentation/Service_Area_Tools_Guide) for a more more in-depth guide on how to install, use and debug the code with specific use cases and examples.
 
 <details>
 <summary><b>Click Here To Show Example Code Usage</b></summary>
@@ -149,15 +159,15 @@ The tools within this repository are useful for the following:
 ## Roadmap
 
 The roadmap provides a glimpse into the current plans and priorities for future releases:
+### Ongoing Development
+- **Improving Examples and Documention**: Increase the number of examples and detail in the documentation.
+- **Shortest_path_iterator**: Increase the efficiency of shortest_path_iterator to make it feasible with realistic datasets.
 
 ### Upcoming Features (v1.1)
-- **Improved Example**: Increase the complexity of the `data_analysis.ipynb` example script.
-
-### Upcoming Features (v1.2)
 
 - **Online Road Network Compatibility**: Graph creation will be handled more dynamically with packages such as `pyrosm` and `osmnx`
 
-### Planned Features (v1.3+)
+### Planned Features (v1.2+)
 
 - **Individual Start-to-End Shortest Routes**: Create additional tools to handle computationally intensive shortest routes between start and end location. The goal will be to iterate over numerous start and end locations to calculate the shortest route between each start location and end location.
 - **Develop GUI**: A GUI will be developed to enable non-code users to engage with some of the more basic and principal tools.
@@ -166,16 +176,52 @@ The roadmap provides a glimpse into the current plans and priorities for future 
 
 ### Known Issues & Limitations
 
+<details>
+<summary><b>Show Issues & Limitations</b></summary>
+
 - **Issue 1**: Currently only handles off-line .pbf files - due to be handled in v1.1 release
 - **Issue 2**: Graph creation from other file formats not currently supported.
 - **Issue 3**: Dissolved network service areas currently do not retain parent information - this should change soon.
+- **Issue 4**: **Shortest_path_iterator()** is incredibly inefficient at calculating the nearest node and path finding, as such is not feasible currently to use and is **NOT** recommended to be used.
+
+If you have any issues or are struggling to implement the tools, PLEASE READ THE [HOW-TO GUIDE](Documentation/Service_Area_Tools_Guide) before raising an issue or contacting myself.
+
+</details>
+
+## Packages Used and References
+The following list contains linked and references to all used packages and data as part of the project:
+<details>
+<summary><b>Show packages and data sources</b></summary>
+
+#### Packages:
+- [Python >= 3.6](https://www.python.org/)
+- [pyrosm](https://github.com/KuangJuiHsu/pyrosm)
+- [osmnx](https://github.com/gboeing/osmnx)
+- [geopandas <= 0.14.3](https://github.com/geopandas/geopandas)
+- [pandas <= 2.2.2](https://github.com/pandas-dev/pandas)
+- [networkx](https://github.com/networkx/networkx)
+- [ipykernel](https://github.com/ipython/ipykernel)
+- [matplotlib](https://github.com/matplotlib/matplotlib)
+- [alphashape](https://github.com/Aluriak/alphashape)
+- [faker](https://github.com/joke2k/faker)
+- [folium](https://github.com/python-visualization/folium)
+- [notebook](https://github.com/jupyter/notebook)
+- [nb_conda](https://github.com/Anaconda-Platform/nb_conda)
+- [jupyter_client](https://github.com/jupyter/jupyter_client)
+- [jupyter_core](https://github.com/jupyter/jupyter_core)
+- [tqdm](https://github.com/tqdm/tqdm)
+
+#### Data:
+- [NISRA Census (Northern Ireland) Statistics](https://www.nisra.gov.uk/statistics)
+- [OpenStreetMap](https://www.openstreetmap.org/)
+
+</details>
 
 ## Contributing
 
 We will be welcoming contributions from the community, particularly with bugs. You can contribute by:
 
 - [Submitting bugs and feature requests](https://github.com/hularuns/Service-Area-Tools/issues), and help us verify as they are checked in.
-
 
 ## License
 

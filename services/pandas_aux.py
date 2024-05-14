@@ -30,18 +30,18 @@ def append_col_prefix(df, col_names:list, prefix):
     -----------
     - df (DataFrame): input dataframe, can be geopandas or pandas.
     - col_names (list): List of columns to append.
-    - prefix (str|int): Prefix to append to the column names.
+    - prefix (str or int): Prefix to append to the column names.
     
     Example:
     --------
     >>> df.column # dataframe with numerical values
-    >>> Index([1000.0, 2000.0, 3000.0], dtype='float64', name='distance')
+    >>> Index([1000.0, 2000.0, 3000.0], dtype='float64', name = 'distance')
     >>>
-    >>> df_renamed = pdaux.append_col_prefix(df, [1000, 2000,3000], prefix='households')   
+    >>> df_renamed = pdaux.append_col_prefix(df = df, col_names = [1000, 2000,3000], prefix = 'households')   
     >>>
     >>> # Print renamed columns.  
     >>> df_renamed.columns
-    >>> Index([households_1000, households_2000, households_3000], dtype='object) 
+    >>> Index([households_1000, households_2000, households_3000], dtype = 'object) 
     
     """
     rename_dict = {}
