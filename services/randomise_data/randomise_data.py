@@ -4,9 +4,10 @@ import numpy as np
 from shapely.geometry import Point
 from shapely.affinity import translate
 import random
+import os
+# Load the dataset which is gitignored fyi.
 
-# Load the dataset
-gdf = gpd.read_file(r'C:\Users\hular\projects\ClosestDestination\testEnvironment\pointer\pointer.shp')
+gdf = gpd.read_file(os.getcwd() + r'\testEnvironment\pointer\pointer.shp')
 
 # Uncomment this to drop random amounts of the data, although, don't think it's necessary if i shift the data about randomly
 # number_to_drop = len(gdf) // 10
@@ -33,4 +34,4 @@ for i, row in gdf.iterrows():
     gdf.at[i, 'geometry'] = new_geometry
 
 gdf.drop(columns=['shift_x', 'shift_y'], inplace=True)
-gdf.to_file(r'C:\Users\hular\projects\ClosestDestination\testEnvironment\Data\pointer_randomised.shp')
+gdf.to_file(os.getcwd() +r'\testEnvironment\Data\pointer_randomised.shp')

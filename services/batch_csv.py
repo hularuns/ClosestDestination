@@ -9,10 +9,18 @@ def batch_csv_read(file_paths:list):
     Parameters:
     -----------
         file_paths (list): A list of file paths, each string should look like '/data/stored/here/mydata.csv'.
-        low_case_cols (bool): If true, will convert all column names to lower case.
         
     Example:
     --------
+    >>> # Define file paths – relative path for each csv
+    >>> file_paths = [
+    >>> '/testEnvironment/Data/census_data/ni-2021-usual-residents.csv',
+    >>> '/testEnvironment/Data/census_data/ni-2021-households.csv',
+    >>> '/testEnvironment/Data/census_data/ni-2021-employment-deprivation.csv'
+    >>> ]
+    >>> load all defined csvs
+    >>> loaded_csv = batch_csv.batch_csv_read(file_paths)
+    
     """
     base_dir = os.getcwd()
     csv_loaded = {}

@@ -103,8 +103,8 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
     -----------
         graph (networkx.Graph): The graph representing the network.
         start_locations (GeoDataFrame): Geopandas GeoDataFrame of start locations.
-        location_name (str): Optional; column storing name of start location.
-        anon_name (bool): If True, generates fake names.
+        location_name (str): Optional; column storing name of start location, if no column name do not specify.
+        anon_name (bool): If True, generates fake names, location_name doesn't have to be specified.
         
     Example:
     --------

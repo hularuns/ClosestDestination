@@ -7,10 +7,16 @@ def join_census_csv(dict_of_df:dict, join_column:str, drop:bool, join_type='left
     geography_code or whaterver the join column is should be returned as dropped from the right dataframe.
     
     Parameters: 
+    -----------
         dict_of_df (dict): dictionary of dataframes, a result of the mass_csv_read() function.
         join_column (str): column name to join by.
         drop (bool): Drop duplicate columns if true, else keep them.
-        join_type (str): type of join - SQL-like, see pd.merge() docs.
+        join_type (str): type of join - SQL-like, see pd.merge() docs. Recommended to use 'left' or 'inner' join where possible.
+
+    Example:
+    --------
+    >>> joined_census_data = census_merge.join_census_csv(loaded_csv, 'geography code',  
+                                                          drop=True,join_type='left')
 """
     joined_df = next(iter(dict_of_df.values()))
     columns_dropped = []
@@ -40,10 +46,11 @@ def join_census_csv(dict_of_df:dict, join_column:str, drop:bool, join_type='left
 
 ## Remove duplicates if they are the right suffix. Retains the Left suffix variant and cleans the names
 def drop_dupe_cols(df:pd.DataFrame, suffixes:tuple):
-    """ Drops the suffixes from the merged pandas dataframe and removeng duplicate columns from the right table if they are prsent in the left table.
+    """ Drops the suffixes from the merged pandas dataframe and removing duplicate columns from the right table if they are prsent in the left table.
     Parameters:
-        - df (pd.DataFrame): A pandas dataframe.
-        - suffixes (tuple): A tuple string of the suffix names from the merge.
+        - df (DataFrame): Pandas DataFrame which has duplicate columns appended due to a merge or join operation, such as ‘name_left’ and ‘name_right’.
+        - suffixes (tuple): Tuples (left_suffix, right_suffix) which were used to retain duplicate columns, e.g. ‘name_left’ and ‘name_right’.
+
         """
     left_suffix, right_suffix = suffixes
     columns_to_drop = []
