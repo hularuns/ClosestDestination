@@ -321,9 +321,10 @@ search_dz_name.add_to(m)
 # layer control
 folium.LayerControl().add_to(m)
 
+save_name = 'test'
 # Save the map to an HTML file 
-m.save('test.html', cdn_resources='cdn')
-
+m.save(f'{save_name}.html', cdn_resources='cdn')
+print(f'Map has been saved as {save_name}')
 m
 
 
