@@ -11,6 +11,7 @@ from faker import Faker
 import time
 from tqdm import tqdm
 import uuid
+import warnings
 
 def load_osm_network(file_path:str, network_type:str, graph_type:str):
     """ Load an OSM file and extract the network (driving, walking etc) as a graph (e.g. networkx graph) along with its nodes and edges.
@@ -292,49 +293,59 @@ def service_bands(geodataframe:gpd.GeoDataFrame, dissolve_cat:str, aggfunc:str =
 
 
 def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locations:gpd.GeoDataFrame, networkx_graph):
-    """ Shortest distance to destination function. Iterates over each destination for each input location.
-    Uses dijkstra's algorithm to iterate. WARNING - TAKES A VERY LONG TIME.
+    """ Shortest distance to destination using dijkstra's algorithm. The function iterates over destination for 
+    each start location, returning a dataframe with the closest destination. 
     
-    Parameters:
-        beginning_dataset (GeoDatFrame): Start location dataset with geometry
-        destination_dataset (GeoDatFrame): Destination dataset with geometry
-        network_x_graph (MultiDiGraph): graph created using networkx {default: g}
+    WARNING - TAKES A VERY LONG TIME - advised to not use!
+    
+    Paramters:
+        start_locations (GeoDataFrame): geopandas DataFrame of start locations such as houses.
+        destination_dataset (GeoDatFrame): geopandas DataFrame of end locations such as hospitals or supermarkets.
+        network_x_graph (MultiDiGraph): graph created using networkx. Default 'G'.
         
     Example:
     --------
     
-    >>> shortest_path_iterator(pointer, start_locations_gdf, G)
+    >>> shortest_path_iterator(start_locations = house_data, destination_locations = hospitals, networkx_graph = G)
     """
-    print("WARNING: This process will take an outrageous amount of time.")
-    #Preload the nearest nodes to destination to reduce insane run times
-    # by ceating a dict of destination ids to iterate over with houses.
-    dest_node_ids = {}
+    #warning.
     
-    for index, row in destination_locations.iterrows():
-        # start_time = time.time() 
-        print(f"{index+1} of {len(destination_locations)}")
-        dest_x = row['geometry'].x
-        dest_y = row['geometry'].y
-        dest_node_ids[index] = ox.distance.nearest_nodes(networkx_graph, dest_x, dest_y)
+    if len(start_locations) >= 100 or len(destination_locations) >= 100:
+        warnings.warn(f'Your dataset is quite large, this may take an incredibly long time to process. 
+                      Consider using the {service_areas} function instead. 
+                      To stop the process interrupt with keyboard command such as Ctrl+C', UserWarning)
+    else:
+        warnings.warn('Iterating over large datasets take a very long time. To stop the process interrupt with keyboard command such as Ctrl+C',
+                      UserWarning)
+    
+    #Preload the nearest nodes to destination to reduce insane run times using nearest_node_and_name function into a nameless dict
 
+    dest_node_ids = nearest_node_and_name(graph= networkx_graph, locations=destination_locations)
+    
+    start_locations['shortest_dist_to_dest'] = float('inf')
     #iterate over each house, then library.
+    print('Calculating the shortest distances now for each start location')
     for index, row in tqdm(start_locations.iterrows(), total=len(start_locations), desc="Calculating shortest paths"):
         orig_x = row['geometry'].x
         orig_y = row['geometry'].y       
-        orig_node_id = ox.distance.nearest_nodes(networkx_graph, X = orig_x, Y = orig_y)
+        orig_node_id = ox.distance.nearest_nodes(networkx_graph, orig_x, orig_y)
         
 
         # iterate over destination node id dictionary for shortest distance out of all desitnations
         shortest_distance = float('inf')
 
-        for index, dest_node_id in dest_node_ids.items():
-            path_length = nx.shortest_path_length(networkx_graph, source=orig_node_id, target = dest_node_id,
-                                                  weight = 'length')
+        for dest_name, dest_info in dest_node_ids.items():
+            dest_node_id = dest_info['nearest_node']  # gets the node ID
+
+            path_length = nx.shortest_path_length(networkx_graph, source=orig_node_id, target=dest_node_id, weight='length')
             if path_length < shortest_distance:
                 shortest_distance = path_length
+
  
-        # Update the shortest distance in the DataFrame
+        # Updates the shortest distance in the gdf
         start_locations.at[index, 'shortest_dist_to_dest'] = shortest_distance
+        
+    return start_locations
         
         
         
