@@ -311,12 +311,12 @@ def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locatio
     #warning.
     
     if len(start_locations) >= 100 or len(destination_locations) >= 100:
-        warnings.warn(f'Your dataset is quite large, this may take an incredibly long time to process. 
-                      Consider using the {service_areas} function instead. 
-                      To stop the process interrupt with keyboard command such as Ctrl+C', UserWarning)
+        warnings.warn('Your dataset is quite large, this may take an incredibly long time to process. ' 
+            'Consider using the service_areas function instead for more efficient computation.',
+            UserWarning)
     else:
-        warnings.warn('Iterating over large datasets take a very long time. To stop the process interrupt with keyboard command such as Ctrl+C',
-                      UserWarning)
+        warnings.warn("Iterating over large datasets takes a very long time. To stop the process, interrupt with a keyboard command such as Ctrl+C.",
+            UserWarning)
     
     #Preload the nearest nodes to destination to reduce insane run times using nearest_node_and_name function into a nameless dict
 
