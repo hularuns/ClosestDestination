@@ -110,7 +110,7 @@ def nearest_node_and_name(graph, locations: gpd.GeoDataFrame, location_name: str
     --------
     
     >>> name = gdf['name']
-    >>> node_dict = services.network_bands.nearest_node_and_bane(graph = G, locations = gdf, location_name = name
+    >>> node_dict = services.network_bands.nearest_node_and_name(graph = G, locations = gdf, location_name = name
     >>>                                                          anon_name = False)
     >>> print(node_dict)
     >>>  {'Ardoyne Library': {'nearest_node': 475085580},
@@ -119,10 +119,7 @@ def nearest_node_and_name(graph, locations: gpd.GeoDataFrame, location_name: str
     
     """   
     # Initialise service_xy based on the presence of location_name
-    if location_name is None and not anon_name:
-        service_xy = []
-    else:
-        service_xy = {}
+    service_xy = {}
     
     # Generate fake names if required. Anonymised naming. Also forces a workaround forcing dictionary if no name data, 
     # could just use uuid though. Bit experimental
@@ -338,3 +335,6 @@ def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locatio
  
         # Update the shortest distance in the DataFrame
         start_locations.at[index, 'shortest_dist_to_dest'] = shortest_distance
+        
+        
+        
