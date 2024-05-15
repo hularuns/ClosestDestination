@@ -46,7 +46,7 @@ start_locations_gdf = network_bands.csv_to_gdf(csv = start_locations, x_col = 'X
 
 # %%
 #Create a dictionary of start locations and their nearest node on the network graph.
-start_locations_nearest_node = network_bands.nearest_node_and_name(graph=G, start_locations=start_locations_gdf,  
+start_locations_nearest_node = network_bands.nearest_node_and_name(graph=G, locations = start_locations_gdf,  
                                                                    location_name = 'Static Library Name')
 
 
