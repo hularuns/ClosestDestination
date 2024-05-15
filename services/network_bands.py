@@ -140,7 +140,7 @@ def nearest_node_and_name(graph, locations: gpd.GeoDataFrame, location_name: str
         location_y = row['geometry'].y
         nearest_node = ox.distance.nearest_nodes(graph, location_x, location_y)
         
-        # Add nearest node name to service_xy
+        # Add nearest node name to service_xy, no location name specified, location_{index} is the name
         if location_name:
             name = row[location_name]
             service_xy[name] = {'nearest_node': nearest_node}        
@@ -212,6 +212,7 @@ def service_areas(nearest_node_dict:dict, graph, search_distances:list, alpha_va
             # service_areas_dict[name] = alpha_shape #uncomment to check if function returns correct variables
 
     gdf_alpha = gpd.GeoDataFrame(data_for_gdf, crs= 4326)
+    
     if save_output:
         gdf_alpha.to_file('service_areas.gpkg')
         print(f'service area polygons have been successfully saved to a geopackage')
@@ -319,13 +320,13 @@ def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locatio
             UserWarning)
     
     #Preload the nearest nodes to destination to reduce insane run times using nearest_node_and_name function into a nameless dict
-
+    print(f'Calculating the nearest node on the network graph for each start location')
     dest_node_ids = nearest_node_and_name(graph= networkx_graph, locations=destination_locations)
     
     start_locations['shortest_dist_to_dest'] = float('inf')
     #iterate over each house, then library.
-    print('Calculating the shortest distances now for each start location')
-    for index, row in tqdm(start_locations.iterrows(), total=len(start_locations), desc="Calculating shortest paths"):
+
+    for index, row in tqdm(start_locations.iterrows(), total=len(start_locations), desc=f"Calculating and identifying the shortest path between each start location and the nearest of the destination locations"):
         orig_x = row['geometry'].x
         orig_y = row['geometry'].y       
         orig_node_id = ox.distance.nearest_nodes(networkx_graph, orig_x, orig_y)
@@ -341,7 +342,6 @@ def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locatio
             if path_length < shortest_distance:
                 shortest_distance = path_length
 
- 
         # Updates the shortest distance in the gdf
         start_locations.at[index, 'shortest_dist_to_dest'] = shortest_distance
         

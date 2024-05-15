@@ -73,7 +73,8 @@ services.network_bands.network_start_locations_nearest_node  =  nearest_node_and
 ### Example Script:
 
 For a detailed example, see [**data_analysis.ipynb**](data_analysis.ipynb) which is a script showing how to use the tools and some example analysis using data in [testEnvironment/Data](testEnvironment/Data). 
- 
+
+An example script showcasing the WIP shortest_path_iterator() function is available in [**shortest_path_example**](test_cases/shortest_path_example.ipynb)
 
 
 #### Running the Example Script:
