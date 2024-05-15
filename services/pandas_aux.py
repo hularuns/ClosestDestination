@@ -2,7 +2,7 @@
 import pandas as pd
 
 
-def fill_na_with_zero(df, columns):
+def fill_na_with_zero(df, columns:str):
     """
       Replaces all NaN values with a 0 in specified columns in a pandas DataFrame.
       Returns a pd.DataFrame.
