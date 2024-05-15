@@ -90,7 +90,7 @@ def csv_to_gdf(csv, x_col:str, y_col:str, input_crs:int, crs_conversion:int = No
         print(f'Exception error: {Exception}')
         
         
-def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_name: str = None, 
+def nearest_node_and_name(graph, locations: gpd.GeoDataFrame, location_name: str = None, 
                           anon_name: bool = False):
     """ Creates a dictionary of location names and nearest node on Graph. If no location name column specified, creates a list.
     Anonymised naming can be enabled by not inputting location_name and anon_name = True. This also forces a dictionary type if you only have point data.
@@ -102,15 +102,15 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
     Parameters:
     -----------
         graph (networkx.Graph): The graph representing the network.
-        start_locations (GeoDataFrame): Geopandas GeoDataFrame of start locations.
-        location_name (str): Optional; column storing name of start location, if no column name do not specify.
+        locations (GeoDataFrame): Geopandas GeoDataFrame of start locations.
+        location_name (str): Optional; column storing name of location, if no column name do not specify.
         anon_name (bool): If True, generates fake names, location_name doesn't have to be specified.
         
     Example:
     --------
     
     >>> name = gdf['name']
-    >>> node_dict = services.network_bands.nearest_node_and_bane(graph = G, start_locations = gdf, location_name = name
+    >>> node_dict = services.network_bands.nearest_node_and_bane(graph = G, locations = gdf, location_name = name
     >>>                                                          anon_name = False)
     >>> print(node_dict)
     >>>  {'Ardoyne Library': {'nearest_node': 475085580},
@@ -130,14 +130,14 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
         fake = Faker()
         fake_names = []
         
-        for i in range(len(start_locations)):
+        for i in range(len(locations)):
             fake_names.append(fake.city())
             
-        start_locations['Fake Name'] = fake_names
+        locations['Fake Name'] = fake_names
         location_name = 'Fake Name' 
         
-    # Calculate the nearest note for each start_location
-    for index, row in tqdm(start_locations.iterrows(), total=start_locations.shape[0], desc="Processing start locations"):
+    # Calculate the nearest note for each location
+    for index, row in tqdm(locations.iterrows(), total=locations.shape[0], desc="Processing start locations"):
         location_x = row['geometry'].x
         location_y = row['geometry'].y
         nearest_node = ox.distance.nearest_nodes(graph, location_x, location_y)
@@ -147,7 +147,9 @@ def nearest_node_and_name(graph, start_locations: gpd.GeoDataFrame, location_nam
             name = row[location_name]
             service_xy[name] = {'nearest_node': nearest_node}        
         else:
-            service_xy.append({'nearest_node': nearest_node})
+            name = f"location_{index}"
+        
+        service_xy[name] = {'nearest_node': nearest_node}
 
     return service_xy
 
@@ -296,7 +298,7 @@ def shortest_path_iterator(start_locations:gpd.GeoDataFrame, destination_locatio
     """ Shortest distance to destination function. Iterates over each destination for each input location.
     Uses dijkstra's algorithm to iterate. WARNING - TAKES A VERY LONG TIME.
     
-    Paramters:
+    Parameters:
         beginning_dataset (GeoDatFrame): Start location dataset with geometry
         destination_dataset (GeoDatFrame): Destination dataset with geometry
         network_x_graph (MultiDiGraph): graph created using networkx {default: g}
