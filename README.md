@@ -1,5 +1,5 @@
 # Service Area Tools
-![Python](https://img.shields.io/badge/python-3.06+-blue.svg) 
+![Python](https://img.shields.io/badge/python-3.9_|_3.10_|3.11_|_3.12-blue.svg) 
 ![GitHub Release](https://img.shields.io/github/v/release/hularuns/Service-Area-Tools)
 
 ## Overview
@@ -12,7 +12,7 @@ These tools can be used in standalone projects, simply by including the [service
 Please read the [How-To Guide](Documentation/Service_Area_Tools_Guide) for a full guide on the use of this tool.
 
 ## Requirements
-- Python 3.06+
+- Python 3.9+ (Confirmed to work on 3.9, 3.10, 3.11 & 3.12)
 - Jupyter Notebooks (optional)
 - Currently these tools utilise offline OSM data  `.pbf` files for the creation of the road networks. The use of tools such as [osmconvert](https://wiki.openstreetmap.org/wiki/Osmconvert) or [Osmosis](https://wiki.openstreetmap.org/wiki/Osmosis) can be used to obtain large OSM road network areas.
 
@@ -29,12 +29,12 @@ git clone https://github.com/hularuns/Service-Area-Tools
 All dependencies can be installed using pip with the following command: 
 
  ```bash 
- pip install "python>=3.6,<3.13" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel matplotlib pyrosm alphashape faker folium jupyter tqdm
+ pip install "python>=3.9" "geopandas<=0.14.3" "pandas<=2.2.2" networkx ipykernel matplotlib pyrosm alphashape faker folium jupyter tqdm
  ```
  
  Should you wish to only use the core functionality and not run the example script, you only need to install the following:
  ```bash
- pip install "python>=3.6" "geopandas<=0.14.3" "pandas<=2.2.2" networkx matplotlib pyrosm alphashape faker tqdm
+ pip install "python>=3.9" "geopandas<=0.14.3" "pandas<=2.2.2" networkx matplotlib pyrosm alphashape faker tqdm
 ```
 #### Install with Conda
 Optionally, you can also install all dependencies using conda with the following steps:
