@@ -9,7 +9,7 @@ This repository contains Python scripts aimed at automating the creation of road
 
 These tools can be used in standalone projects, simply by including the [services](services/) folder within your project's repository.
 
-Please read the [How-To Guide](Documentation/Service_Area_Tools_Guide) for a full guide on the use of this tool.
+Please read the [How-To Guide](Documentation/Service_Area_Tools_Guide) for a full guide on the use of this tool. For an interactive version with functional links, please download as GitHub currently does not support links within PDFs.
 
 ## Requirements
 - Python 3.9+ (Confirmed to work on 3.9, 3.10, 3.11 & 3.12)
